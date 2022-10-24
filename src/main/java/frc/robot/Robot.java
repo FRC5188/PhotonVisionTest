@@ -5,6 +5,7 @@
 package frc.robot;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -45,6 +46,16 @@ public class Robot extends TimedRobot {
     var result = camera.getLatestResult();
     boolean hasTargets = result.hasTargets();
     System.out.println(result);
+    if(hasTargets == true){
+      PhotonTrackedTarget target = result.getBestTarget();
+      double yaw = target.getYaw();
+      double pitch = target.getPitch();
+      double area = target.getArea();
+      double skew = target.getSkew();
+      System.out.printf("Yaw: %.2f Pitch: %.2f Area: %.2f Skew: %.2f\n", yaw, pitch, area, skew);
+    }
+
+    
 
   }
   @Override
