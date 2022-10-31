@@ -43,21 +43,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    var result = camera.getLatestResult();
-    boolean hasTargets = result.hasTargets();
-    System.out.println(result);
-    if(hasTargets == true){
-      PhotonTrackedTarget target = result.getBestTarget();
-      double yaw = target.getYaw();
-      double pitch = target.getPitch();
-      double area = target.getArea();
-      double skew = target.getSkew();
-      System.out.printf("Yaw: %.2f Pitch: %.2f Area: %.2f Skew: %.2f\n", yaw, pitch, area, skew);
+    
     }
 
     
 
-  }
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
@@ -100,5 +90,25 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    int counter = 0;
+    var result = camera.getLatestResult();
+    if(result.hasTargets()){
+      PhotonTrackedTarget target = result.getBestTarget();
+      double yaw = target.getYaw();
+      double pitch = target.getPitch();
+      double area = target.getArea();
+      double skew = target.getSkew();
+      int fid = target.getFiducialId();
+      if(counter%25==0){
+        System.out.printf("Yaw: %.2f Pitch: %.2f Area: %.2f Skew: %.2f ID: %d\n", yaw, pitch, area, skew, fid);
+      }
+      System.out.printf("Yaw: %.2f Pitch: %.2f Area: %.2f Skew: %.2f ID: %d\n", yaw, pitch, area, skew, fid);
+    } else if(counter%25==0){
+      System.out.println(result.getLatencyMillis());
+      System.out.println(camera.getPipelineIndex());
+    }
+    counter += 1;
+    counter = counter%1000;
+  }
 }
