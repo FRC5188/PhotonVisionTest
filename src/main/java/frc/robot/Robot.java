@@ -5,11 +5,13 @@
 package frc.robot;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.VisionProcessing.Target;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -22,7 +24,9 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  PhotonCamera camera = new PhotonCamera("photonvision");
+
+  private PhotonCamera camera;
+  private VisionProcessing _vp;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -86,29 +90,39 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {}
+  public void testInit() {
+    camera = new PhotonCamera("photonvision");
+    _vp = new VisionProcessing(camera);
+  }
 
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    int counter = 0;
-    var result = camera.getLatestResult();
-    if(result.hasTargets()){
-      PhotonTrackedTarget target = result.getBestTarget();
-      double yaw = target.getYaw();
-      double pitch = target.getPitch();
-      double area = target.getArea();
-      double skew = target.getSkew();
-      int fid = target.getFiducialId();
-      if(counter%25==0){
-        System.out.printf("Yaw: %.2f Pitch: %.2f Area: %.2f Skew: %.2f ID: %d\n", yaw, pitch, area, skew, fid);
-      }
-      System.out.printf("Yaw: %.2f Pitch: %.2f Area: %.2f Skew: %.2f ID: %d\n", yaw, pitch, area, skew, fid);
-    } else if(counter%25==0){
-      System.out.println(result.getLatencyMillis());
-      System.out.println(camera.getPipelineIndex());
+    // int counter = 0;
+    // var result = camera.getLatestResult();
+    // if(result.hasTargets()){
+    //   PhotonTrackedTarget target = result.getBestTarget();
+    //   double yaw = target.getYaw();
+    //   double pitch = target.getPitch();
+    //   double area = target.getArea();
+    //   double skew = target.getSkew();
+    //   int fid = target.getFiducialId();
+    //   if(counter%25==0){
+    //     System.out.printf("Yaw: %.2f Pitch: %.2f Area: %.2f Skew: %.2f ID: %d\n", yaw, pitch, area, skew, fid);
+    //   }
+    //   System.out.printf("Yaw: %.2f Pitch: %.2f Area: %.2f Skew: %.2f ID: %d\n", yaw, pitch, area, skew, fid);
+    // } else if(counter%25==0){
+    //   System.out.println(result.getLatencyMillis());
+    //   System.out.println(camera.getPipelineIndex());
+    // }
+    // counter += 1;
+    // counter = counter%1000;
+
+    PhotonPipelineResult result = camera.getLatestResult();
+    if (result.hasTargets()) {
+      Target target = _vp.getTarget(result.getBestTarget());
+
+      //System.out.println("Distance: " + target.distance + " Angle: " + target.angle);
     }
-    counter += 1;
-    counter = counter%1000;
   }
 }
